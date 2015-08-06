@@ -92,7 +92,8 @@ SELECT
       // we have to clone the repo
       chdir($conf['repos_dir']);
 
-      $github_path = str_replace('https://github.com/', 'git@github.com:', $project['url']);
+      // $github_path = str_replace('https://github.com/', 'git@github.com:', $project['url']);
+      $github_path = $project['url'];
 
       $command = 'git clone '.$github_path;
       echo $command."\n";
