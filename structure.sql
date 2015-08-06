@@ -30,7 +30,7 @@ CREATE TABLE `commit` (
   `occured_on` datetime DEFAULT NULL,
   `message` text,
   PRIMARY KEY (`commit_id`)
-) ENGINE=MyISAM AUTO_INCREMENT=15790 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -46,7 +46,7 @@ CREATE TABLE `project` (
   `url` varchar(255) DEFAULT NULL,
   `local_dir` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`project_id`)
-) ENGINE=MyISAM AUTO_INCREMENT=55 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
