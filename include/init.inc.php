@@ -1,5 +1,5 @@
 <?php
-include('include/functions_mysqli.inc.php');
+include(dirname(__FILE__).'/functions_mysqli.inc.php');
 
 $conf['db_host'] = 'localhost';
 $conf['db_user'] = 'root';

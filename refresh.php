@@ -1,5 +1,5 @@
 <?php
-include('include/init.inc.php');
+include(dirname(__FILE__).'/include/init.inc.php');
 
 // fetch projects
 $query = '
