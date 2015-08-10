@@ -1,4 +1,9 @@
 <?php
+if (isset($_SERVER['HTTP_HOST']))
+{
+  die('this is a CLI script, bye');
+}
+
 include(dirname(__FILE__).'/include/init.inc.php');
 
 // fetch projects
