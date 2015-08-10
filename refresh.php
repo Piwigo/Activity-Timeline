@@ -6,6 +6,42 @@ if (isset($_SERVER['HTTP_HOST']))
 
 include(dirname(__FILE__).'/include/init.inc.php');
 
+// +-----------------------------------------------------------------------+
+// | Basic page settings                                                   |
+// +-----------------------------------------------------------------------+
+
+$page['script'] = basename(__FILE__);
+$page['lock_file'] = '/tmp/'.$page['script'].'.lock';
+
+// +-----------------------------------------------------------------------+
+// | Single instance                                                       |
+// +-----------------------------------------------------------------------+
+
+if (file_exists($page['lock_file']))
+{
+  # is the script really running?
+  $pid = file_get_contents($page['lock_file']);
+
+  if (file_exists('/proc/'.$pid))
+  {
+    echo '['.$page['script'].' pid='.$pid.'] in progress, another instance already running';
+    exit();
+  }
+  else
+  {
+    echo '['.$page['script'].'] notify admin because the previous execution seems to go wrong;';
+    echo ' lock file removed automatically';
+    echo "\n";
+    unlink($page['lock_file']);
+  }
+}
+
+file_put_contents($page['lock_file'], getmypid());
+
+// +-----------------------------------------------------------------------+
+// | Main loop                                                             |
+// +-----------------------------------------------------------------------+
+
 // fetch projects
 $query = '
 SELECT *
@@ -169,4 +205,11 @@ SELECT
 
   echo "\n";
 }
+
+// +-----------------------------------------------------------------------+
+// | Unlock script                                                         |
+// +-----------------------------------------------------------------------+
+
+@unlink($page['lock_file']);
+exit();
 ?>
