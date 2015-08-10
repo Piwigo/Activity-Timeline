@@ -13,6 +13,8 @@ include(dirname(__FILE__).'/include/init.inc.php');
 $page['script'] = basename(__FILE__);
 $page['lock_file'] = '/tmp/'.$page['script'].'.lock';
 
+$opt = getopt('', array('verbose'));
+
 // +-----------------------------------------------------------------------+
 // | Single instance                                                       |
 // +-----------------------------------------------------------------------+
@@ -53,8 +55,6 @@ $projects = query2array($query);
 // loop on projects
 foreach ($projects as $project)
 {
-  echo $project['name'].'...';
-  
   $commits = array();
   $output = null;
   $last_commit = null;
@@ -200,10 +200,15 @@ SELECT
 
   if (count($commits) > 0)
   {
-    echo ' '.count($commits).' commits added';
+    echo '['.$project['name'].'] '.count($commits).' commits added'."\n";
   }
-
-  echo "\n";
+  else
+  {
+    if (isset($opt['verbose']))
+    {
+      echo '['.$project['name'].'] no new commit'."\n";
+    }
+  }
 }
 
 // +-----------------------------------------------------------------------+
