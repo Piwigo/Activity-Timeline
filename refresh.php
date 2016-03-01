@@ -67,7 +67,6 @@ SELECT
   FROM commit
   WHERE project_idx = '.$project['project_id'].'
   ORDER BY commit_id DESC
-  LIMIT 50
 ;';
   $old_commits = query2array($query, 'local_id');
   foreach ($old_commits as $commit)
@@ -155,12 +154,10 @@ SELECT
     $command = 'git pull';
     exec($command);
 
+    $command = 'git reset origin/master';
+    exec($command);
+
     $command = 'git log --reverse --pretty=format:"%H~#~%an~#~%ad~#~%s" --date=iso8601';
-    
-    if (isset($last_commit))
-    {
-      $command.= ' --since="'.$last_commit['occured_on'].'"';
-    }
     
     // echo $command."\n";
     
