@@ -1,5 +1,6 @@
 <html>
 <head>
+<meta charset="utf-8">
 <style>
 body {font-size:90%;font-family:sans-serif;}
 .activity {width:800px; margin:0 auto;}
