@@ -73,5 +73,6 @@ $query.= '
 ;';
 $commits = query2array($query);
 
+header('Content-Type: application/json');
 echo json_encode($commits);
 exit();
