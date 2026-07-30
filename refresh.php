@@ -50,6 +50,7 @@ SELECT *
   FROM project
   ORDER BY project_id DESC
 ;';
+//  WHERE url not like "%piwigo.org/svn%"
 $projects = query2array($query);
 
 // loop on projects
@@ -58,6 +59,8 @@ foreach ($projects as $project)
   $commits = array();
   $output = null;
   $last_commit = null;
+
+// echo 'project #'.$project['project_id'].' '.$project['name']."\n";
   
   // get latest commit of the project
   $query = '
@@ -78,7 +81,14 @@ SELECT
 
   if (isset($project['local_dir']))
   {
-    chdir($project['local_dir']);
+    if (is_dir($project['local_dir']))
+    {
+      chdir($project['local_dir']);
+    }
+    else
+    {
+      unset($project['local_dir']);
+    }
   }
   
   // SVN or Git?
@@ -91,8 +101,11 @@ SELECT
         );
     }
 
-    $command = 'svn log --xml -r'.$last_commit['local_id'].':HEAD '.$project['url'];
-    // echo $command."\n";
+    // use direct filesystem access should be faster and avoid noise in the nginx log file
+    $command_url = str_replace('http://piwigo.org/svn', 'file:///svn/piwigo', $project['url']);
+
+    $command = 'svn log --xml -r'.$last_commit['local_id'].':HEAD '.$command_url;
+    // echo $command."\n"; exit();
     
     exec($command, $output);
     // print_r($output); exit();
@@ -117,14 +130,14 @@ SELECT
         'project_idx' => $project['project_id'],
         'local_id' => $logentry['@attributes']['revision'],
         'author' => pwg_db_real_escape_string($logentry['author']),
-        'occured_on' => $logentry['date'],
+        'occured_on' => date('Y-m-d H:i:s', strtotime($logentry['date'])),
         'message' => pwg_db_real_escape_string($logentry['msg']),
         );
       
       $commits[] = $commit;
     }
   }
-  elseif (preg_match('{github.com}', $project['url']))
+  elseif (preg_match('{(github.com|gitlab)}', $project['url']))
   {
     // if (!file_exists($project['local_dir'].'/.git'))
     if (!isset($project['local_dir']))
@@ -139,7 +152,8 @@ SELECT
       echo $command."\n";
       exec($command);
 
-      $local_dir = $conf['repos_dir'].'/'.array_pop(explode('/', $project['url']));
+      // $local_dir = $conf['repos_dir'].'/'.end(explode('/', $project['url']));
+      $local_dir = $conf['repos_dir'].'/'.basename($project['url']);
 
       single_update(
         'project',
@@ -151,11 +165,11 @@ SELECT
     }
     
 
-    $command = 'git pull';
+    $command = 'git pull 2>&1 | grep -v redirecting';
     exec($command);
 
-    $command = 'git reset origin/master';
-    exec($command);
+    // $command = 'git reset origin/master';
+    // exec($command);
 
     $command = 'git log --reverse --pretty=format:"%H~#~%an~#~%ad~#~%s" --date=iso8601';
     
@@ -178,7 +192,7 @@ SELECT
         'project_idx' => $project['project_id'],
         'local_id' => $logentry[0],
         'author' => pwg_db_real_escape_string($logentry[1]),
-        'occured_on' => $logentry[2],
+        'occured_on' => date('Y-m-d H:i:s', strtotime($logentry[2])),
         'message' => pwg_db_real_escape_string($logentry[3]),
         );
       
